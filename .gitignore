@@ -1,0 +1,46 @@
+# ---- Generated datasets ---------------------------------------------------
+# CIFs are shipped in data/mp20_5k/cifs.json; labels remain tracked.
+# Restore separate CIFs with python3 scripts/extract_cifs.py.
+data/mp20_5k/*/*.cif
+# Everything the LMDB builders produce is not: regenerate with
+# scripts/build_lmdb/ (see README "Data").
+*.lmdb
+*.lmdb-lock
+data/mp20_three_property/
+data/mp20_heldout/
+data/mp20_heldout_*/
+data/mp20_5k_eform/
+data/mp20_5k_bandgap/
+data/mp20_5k_gvrh/
+data/**/metadata.npz
+
+# Downloaded source table with CIF strings (~134 MB, too large to host)
+data/all_with_180.csv
+data/alex_mp20_*.csv
+*.zip
+
+# ---- Run outputs ----------------------------------------------------------
+runs/
+outputs/
+logs/
+checkpoints/
+*.pt
+*.ckpt
+events.out.tfevents.*
+wandb/
+
+# ---- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- OS / editor ----------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+
+# ---- Results ---------------------------------------------------------------
+# Written by the evaluation scripts; regenerate rather than commit.
+results/

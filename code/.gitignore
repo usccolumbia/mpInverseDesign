@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.sh
+*.out
+*.err
+*.png
+outputs/
+run_scripts/
+record_extrapolation_v2/
+data/
+*.npz

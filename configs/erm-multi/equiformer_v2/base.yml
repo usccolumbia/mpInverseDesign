@@ -1,0 +1,128 @@
+# Multi-property plain-regression (ERM) backbone.
+#
+# This is the ERM control for MEX-Multi.  The `model:` block below is IDENTICAL
+# to configs/mex-multi/equiformer_v2/base_ebm_multi.yml
+# in every key except `name` (equiformer_v2-direct-multi here vs
+# equiformer_v2-mex-multi there).  Same 8 layers, lmax 4, 128 sphere channels,
+# 20 neighbours, 12 A cutoff, same dropout and weight init, same
+# property_names.  Do not edit one without editing the other, or the comparison
+# stops being controlled.
+#
+# WHAT CHANGES, AND WHAT THAT MEANS FOR THE PARETO COMPARISON
+# -----------------------------------------------------------
+# equiformer_v2-direct-multi shares the backbone (get_mol_rep) and replaces the
+# per-property energy heads with per-property 2-layer MLPs trained by MAE.
+# Consequently this arm has NO derivative-free optimiser, NO search bounds and
+# NO infer_type: a prediction is a single forward pass, and the property vector
+# is read straight off the three heads.
+#
+# So "identical DFO settings across arms" is not achievable and not meaningful
+# here -- the DFO does not exist in the regression arms.  What IS held fixed is
+# everything the front is actually computed from:
+#
+#   * the same 250 test structures,
+#   * one point-estimate property vector per structure,
+#   * the same non-dominated sorting code and objective directions,
+#   * the same DFT-derived true front.
+#
+# The two MEX arms share their DFO settings with each other (S=2000, T=5,
+# noise 0.5 shrinking x0.5, hardcoded in mex_multi_trainer.py) and derive their
+# search bounds from the dataset's train_min_y_*/train_max_y_* fields.  The two
+# regression arms have no such stage.  That difference in procedure must be
+# stated wherever the four arms are compared -- it is not just a different head.
+
+trainer: ocp_multi
+hide_eval_progressbar: True
+
+task:
+  dataset: lmdb
+  description: "Multi-property plain L1 regression (formation energy, band gap, bulk modulus) -- ERM control for MEX-Multi"
+  type: regression
+  metric: mae
+  strict_load: False
+
+# Equal coefficients across properties, matching MEX-Multi's equal treatment of
+# its three NCE terms.  Losses are computed on normalised targets
+# (ocp_trainer.py:359-364), so equal weights do not favour the wide-range
+# property.
+loss_functions:
+  - y_eform:
+      fn: mae
+      coefficient: 1
+  - y_bandgap:
+      fn: mae
+      coefficient: 1
+  - y_gvrh:
+      fn: mae
+      coefficient: 1
+
+# avg_mae is the pooled criterion MEX-Multi selects on
+# (mex_multi_trainer.py:660-668).  OCPTrainer does not compute it, which is why
+# this config uses `trainer: ocp_multi` -- see ocp_multi_trainer.py.  Matching
+# it means best-checkpoint selection, early stopping and the LR schedule key
+# off the same quantity in both multi-property arms.
+evaluation_metrics:
+  metrics:
+    y_eform:
+      - mae
+    y_bandgap:
+      - mae
+    y_gvrh:
+      - mae
+  primary_metric: avg_mae
+
+outputs:
+  y_eform:
+    level: system
+    prediction_dtype: float32
+  y_bandgap:
+    level: system
+    prediction_dtype: float32
+  y_gvrh:
+    level: system
+    prediction_dtype: float32
+
+model:
+  name: equiformer_v2-direct-multi
+  property_names: [eform, bandgap, gvrh]
+  task_name: null
+  atom_noise_scale:         null
+  cell_noise_scale:         null
+  use_pbc:                  True
+  regress_forces:           False
+  otf_graph:                True
+  max_neighbors:            20
+  max_radius:               12.0
+  max_num_elements:         100
+
+  num_layers:               8
+  sphere_channels:          128
+  attn_hidden_channels:     64
+  num_heads:                8
+  attn_alpha_channels:      64
+  attn_value_channels:      16
+  ffn_hidden_channels:      128
+  norm_type:                'layer_norm_sh'
+
+  lmax_list:                [4]
+  mmax_list:                [2]
+  grid_resolution:          18
+
+  num_sphere_samples:       128
+
+  edge_channels:            128
+  use_atom_edge_embedding:  True
+  distance_function:        'gaussian'
+  num_distance_basis:       512
+
+  attn_activation:          'silu'
+  use_s2_act_attn:          False
+  ffn_activation:           'silu'
+  use_gate_act:             False
+  use_grid_mlp:             True
+
+  alpha_drop:               0.1
+  drop_path_rate:           0.1
+  proj_drop:                0.0
+
+  weight_init:              'uniform'

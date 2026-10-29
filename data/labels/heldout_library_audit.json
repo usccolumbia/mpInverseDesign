@@ -1,0 +1,13 @@
+{
+  "heldout_library": 4803,
+  "kvrh_window_gpa": [
+    1.0,
+    600.0
+  ],
+  "removed_below_1_gpa": 7,
+  "removed_above_600_gpa": 23,
+  "removed_total": 30,
+  "heldout_library_kphys": 4773,
+  "max_k_vrh_gpa_unfiltered": 17988714618.261,
+  "note": "Accuracy tables use all 4803; the Pareto evaluation uses the 4773 with physical bulk moduli."
+}

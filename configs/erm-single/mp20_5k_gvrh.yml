@@ -1,0 +1,35 @@
+# Plain-regression baseline: bulk modulus, mp20_5k split.
+#
+# Companion to mp20_5k_eform.yml.  tab:model_comparison reports single-property
+# MEX at 0.216 log10 GPa and MEX-Multi at 0.088.
+#
+# NOTE ON THE NAME: "gvrh" is a legacy field name inherited from the upstream
+# MEX repo.  The target is the Voigt-Reuss-Hill BULK modulus (MP elasticity
+# `bulk_modulus.vrh`, see files/download_bulk_modulus.py), not the shear
+# modulus.  The LMDB key is `y` and holds log10(K_VRH / GPa).
+#
+# Normaliser statistics copied verbatim from
+# configs/mex-single/mp20_5k_gvrh.yml.
+
+includes:
+- configs/erm-single/equiformer_v2/base.yml
+- configs/erm-single/params/base_param.yml
+
+dataset:
+  train:
+    format: lmdb
+    src: data/mp20_5k_gvrh/train
+    weighted_sample: false
+    transforms:
+      normalizer:
+        y:
+          mean: 1.8883200141155556
+          stdev: 0.5052320287880178
+
+  val:
+    src: data/mp20_5k_gvrh/val
+
+  test:
+    src: data/mp20_5k_gvrh/test
+
+logger: tensorboard

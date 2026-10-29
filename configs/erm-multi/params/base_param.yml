@@ -1,0 +1,52 @@
+# Optimiser settings for the multi-property plain-regression (ERM) arm.
+#
+# These are byte-identical to configs/erm-single/params/base_param.yml, the
+# settings the single-property ERM arm used.  That is deliberate: the
+# single-ERM vs multi-ERM contrast is the one that isolates joint training
+# within the regression family, and it is only clean if the optimiser is the
+# same on both sides.
+#
+# They differ from configs/mex-multi/params/base_param_multi.yml (lr 1e-4,
+# weight_decay 0, patience 10), for the same reason documented in
+# configs/erm-single/params/base_param.yml: those values are tuned for a
+# contrastive objective, and running a regressor under them answers a less
+# useful question.  If you want the strictly-matched arm that isolates the
+# read-out alone, flip to the commented block below and run it as a second job.
+#
+# NOTE ON max_epochs: the cluster copy of base_param_multi.yml carries
+# max_epochs: 750 while the repo copy carries 200.  Whichever the MEX-Multi
+# runs you are comparing against actually used, set the same value here before
+# training, or the arms get different budgets.
+#
+# Early-stop patience is NOT set here.  It comes from --early-stop, which
+# defaults to 30 (ocp/ocpmodels/common/flags.py:142); pass it explicitly in the
+# run script so the stopping rule is visible and identical across all arms.
+
+optim:
+  batch_size: 64
+  eval_batch_size: 128
+  load_balancing: atoms
+  num_workers: 4
+  clip_grad_norm: 10
+  max_epochs: 750
+  ema_decay: 0.999
+
+  # --- regression settings (default, matches the single-property ERM arm) ---
+  lr_initial: 0.001
+  optimizer: AdamW
+  optimizer_params:
+    weight_decay: 0.001
+  scheduler: ReduceLROnPlateau
+  mode: min
+  factor: 0.8
+  patience: 5
+
+  # --- MEX-Multi-matched alternative (isolates the read-out alone) ----------
+  # lr_initial: 0.0001
+  # optimizer: AdamW
+  # optimizer_params:
+  #   weight_decay: 0.0
+  # scheduler: ReduceLROnPlateau
+  # mode: min
+  # factor: 0.8
+  # patience: 10

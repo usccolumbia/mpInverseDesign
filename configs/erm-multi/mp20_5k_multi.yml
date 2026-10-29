@@ -1,0 +1,54 @@
+# Multi-property plain-regression (ERM) arm on the mp20_5k split.
+#
+# The fourth arm of the 2x2: {single, multi} x {MEX head, regression head}.
+#
+#   single + MEX        configs/mex-single/mp20_5k_{eform,bandgap,gvrh}.yml
+#   single + regression configs/erm-single/mp20_5k_{eform,bandgap,gvrh}.yml
+#   multi  + MEX        configs/mex-multi/mp20_5k_multi.yml
+#   multi  + regression THIS FILE
+#
+# Data, split and normaliser statistics are copied verbatim from
+# configs/mex-multi/mp20_5k_multi.yml so both multi-property arms
+# see identically scaled targets over the identical 4,500/250/250 LMDB.
+#
+# train_min_y_* / train_max_y_* are carried over even though this arm has no
+# derivative-free search and therefore never uses them.  Keeping them makes the
+# two multi configs diffable line by line, and makes it explicit that the
+# search bounds are a property of the MEX read-out, not of the data.
+
+includes:
+- configs/erm-multi/equiformer_v2/base.yml
+- configs/erm-multi/params/base_param.yml
+
+dataset:
+  property_names: [eform, bandgap, gvrh]
+  # Unused by this arm (no DFO); kept for diffability against the MEX-Multi config.
+  train_max_y_eform:   0.0753554868749999
+  train_min_y_eform:   -4.472611329375
+  train_max_y_bandgap: 9.3913
+  train_min_y_bandgap: 0.0
+  train_max_y_gvrh:    10.57575268
+  train_min_y_gvrh:    -0.35359627
+
+  train:
+    format: lmdb
+    src: data/mp20_5k/train
+    weighted_sample: false
+    transforms:
+      normalizer:
+        y_eform:
+          mean:  -0.8952717141530322
+          stdev: 0.9020065402946057
+        y_bandgap:
+          mean:  0.6654605333333333
+          stdev: 1.4155904141029494
+        y_gvrh:
+          mean:  1.8883200141155556
+          stdev: 0.5052320287880178
+
+  val:
+    src: data/mp20_5k/val
+  test:
+    src: data/mp20_5k/test
+
+logger: tensorboard

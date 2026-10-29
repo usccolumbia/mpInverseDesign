@@ -1,0 +1,99 @@
+{
+  "source_csv_sha256": "35fffbbae5a9a3f568a1a0d588604202093bc0d89221b05750a20d3b270c25b3",
+  "source_csv_count": 45229,
+  "cif_column": "cif",
+  "splits": {
+    "train": {
+      "count": 4500,
+      "lmdb_sha256": "f546483aea17920853d6e5e6a986d8353f7cda9ffba48df7fc542e3acc534ffb"
+    },
+    "val": {
+      "count": 250,
+      "lmdb_sha256": "8b8e990e02b3ce4b55c20811e969f1b79123066aecf1ecda3ce137aad2c2bcc8"
+    },
+    "test": {
+      "count": 250,
+      "lmdb_sha256": "05811b565a4f8595a1bc4c8472fc01bcdd7e0f3a9b91e151e20a79a12b3446c0"
+    }
+  },
+  "target_order": [
+    "formation_energy_per_atom",
+    "band_gap",
+    "bulk_modulus"
+  ],
+  "label_source": "original LMDB y_eform/y_bandgap/y_gvrh; first two exactly equal CSV",
+  "third_target_confirmation": "User confirmed source y_gvrh means raw bulk modulus, 2026-10-23; numerical labels preserved, no log transform or exponentiation",
+  "units": [
+    "eV/atom",
+    "eV",
+    "raw bulk modulus in supplied units"
+  ],
+  "id_overlap": 0,
+  "identical_cif_overlap": 0,
+  "structure_validation_count": 5000,
+  "structure_match_counts": {
+    "direct": 5000
+  },
+  "warning_count": 872,
+  "split_policy": "unchanged supplied 4500/250/250 split; no new random or family split",
+  "geometric_duplicate_scope": "exact CIF hashes and IDs; no exhaustive prototype/family deduplication",
+  "retained_negative_bulk_labels": [
+    {
+      "material_id": "mp-974400",
+      "split": "train",
+      "bulk_modulus": -0.30016227
+    },
+    {
+      "material_id": "mp-28391",
+      "split": "train",
+      "bulk_modulus": -0.28316228
+    },
+    {
+      "material_id": "mp-570510",
+      "split": "train",
+      "bulk_modulus": -0.19178903
+    },
+    {
+      "material_id": "mp-570747",
+      "split": "train",
+      "bulk_modulus": -0.08460016
+    },
+    {
+      "material_id": "mp-23288",
+      "split": "train",
+      "bulk_modulus": -0.00744648
+    },
+    {
+      "material_id": "mp-23230",
+      "split": "train",
+      "bulk_modulus": -0.35359627
+    },
+    {
+      "material_id": "mp-23280",
+      "split": "train",
+      "bulk_modulus": -0.2541448
+    },
+    {
+      "material_id": "mp-30952",
+      "split": "train",
+      "bulk_modulus": -0.03668449
+    },
+    {
+      "material_id": "mp-24504",
+      "split": "train",
+      "bulk_modulus": -0.32882716
+    },
+    {
+      "material_id": "mp-23189",
+      "split": "train",
+      "bulk_modulus": -0.09366496
+    },
+    {
+      "material_id": "mp-30953",
+      "split": "train",
+      "bulk_modulus": -0.13846559
+    }
+  ],
+  "manifest_sha256": "221eaea065e36b890eb3967e716c834d552c953ee2e75f0a15f6e9701c32e8f6",
+  "normalization_sha256": "1b4403d457a71f863397362365bcf6cc06a1b913c5d83151bc17a41c2a00a71b"
+}

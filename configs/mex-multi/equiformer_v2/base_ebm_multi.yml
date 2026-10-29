@@ -1,0 +1,103 @@
+trainer: mex_multi
+hide_eval_progressbar: True
+
+# ─────────────────────────────────────────────────────────────────────────────
+# InfoNCE-vs-NCE ablation (sec:infonce_ablation): identical to
+# base_ebm_mp20_three_property.yml in every respect EXCEPT y_gvrh's loss,
+# which uses local NCE here instead of InfoNCE, to test whether range-matched
+# negative sampling (InfoNCE for the wide-range K_VRH property) is actually
+# load-bearing or just a convenience.
+# ─────────────────────────────────────────────────────────────────────────────
+
+task:
+  dataset: lmdb
+  description: "Multi-property regression (formation energy, band gap, bulk modulus) -- gvrh trained with local NCE instead of InfoNCE (ablation)"
+  type: regression
+  metric: mae
+  strict_load: False
+
+loss_functions:
+  - y_eform:
+      fn: nce
+      coefficient: 1
+  - y_eform:
+      fn: euc
+      coefficient: 0.25
+  - y_bandgap:
+      fn: nce
+      coefficient: 1
+  - y_bandgap:
+      fn: euc
+      coefficient: 0.25
+  - y_gvrh:
+      fn: nce
+      coefficient: 1
+  - y_gvrh:
+      fn: euc
+      coefficient: 0.25
+
+evaluation_metrics:
+  metrics:
+    y_eform:
+      - mae
+    y_bandgap:
+      - mae
+    y_gvrh:
+      - mae
+  primary_metric: avg_mae
+
+outputs:
+  y_eform:
+    level: system
+    prediction_dtype: float32
+  y_bandgap:
+    level: system
+    prediction_dtype: float32
+  y_gvrh:
+    level: system
+    prediction_dtype: float32
+
+model:
+  name: equiformer_v2-mex-multi
+  property_names: [eform, bandgap, gvrh]
+  task_name: null
+  atom_noise_scale:         null
+  cell_noise_scale:         null
+  use_pbc:                  True
+  regress_forces:           False
+  otf_graph:                True
+  max_neighbors:            20
+  max_radius:               12.0
+  max_num_elements:         100
+
+  num_layers:               8
+  sphere_channels:          128
+  attn_hidden_channels:     64
+  num_heads:                8
+  attn_alpha_channels:      64
+  attn_value_channels:      16
+  ffn_hidden_channels:      128
+  norm_type:                'layer_norm_sh'
+
+  lmax_list:                [4]
+  mmax_list:                [2]
+  grid_resolution:          18
+
+  num_sphere_samples:       128
+
+  edge_channels:            128
+  use_atom_edge_embedding:  True
+  distance_function:        'gaussian'
+  num_distance_basis:       512
+
+  attn_activation:          'silu'
+  use_s2_act_attn:          False
+  ffn_activation:           'silu'
+  use_gate_act:             False
+  use_grid_mlp:             True
+
+  alpha_drop:               0.1
+  drop_path_rate:           0.1
+  proj_drop:                0.0
+
+  weight_init:              'uniform'

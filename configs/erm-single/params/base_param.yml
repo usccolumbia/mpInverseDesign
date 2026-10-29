@@ -1,0 +1,48 @@
+# Optimiser settings for the mp20_5k plain-regression baseline.
+#
+# These are the repo's own regression settings (copied from
+# configs/erm/params/base_param.yml), NOT the MEX ones.  That is deliberate.
+#
+# The question this baseline answers is "what does EquiformerV2 achieve on
+# 4,500 structures with an ordinary regression head?"  Answering it requires
+# giving the regressor hyperparameters suited to a regression objective.
+# Running it under the MEX settings (lr 1e-4, weight_decay 0, scheduler
+# patience 10, which are tuned for a contrastive objective) would produce a
+# weak number that answers a different, less useful question.
+#
+# If you also want the strictly-matched arm -- same optimiser as MEX, isolating
+# the read-out alone -- flip to the commented values below and run it as a
+# second job.  Report both if they disagree.
+#
+# Early-stop patience is NOT set here.  It comes from --early-stop, which
+# defaults to 30 (ocp/ocpmodels/common/flags.py:142), matching every MEX run,
+# so the stopping rule is identical across all arms.
+
+optim:
+  batch_size: 64
+  eval_batch_size: 128
+  load_balancing: atoms
+  num_workers: 4
+  clip_grad_norm: 10
+  max_epochs: 200
+  ema_decay: 0.999
+
+  # --- regression settings (default) -------------------------------------
+  lr_initial: 0.001
+  optimizer: AdamW
+  optimizer_params:
+    weight_decay: 0.001
+  scheduler: ReduceLROnPlateau
+  mode: min
+  factor: 0.8
+  patience: 5
+
+  # --- MEX-matched alternative (uncomment to isolate the read-out alone) --
+  # lr_initial: 0.0001
+  # optimizer: AdamW
+  # optimizer_params:
+  #   weight_decay: 0.0
+  # scheduler: ReduceLROnPlateau
+  # mode: min
+  # factor: 0.8
+  # patience: 10

@@ -1,0 +1,86 @@
+# Plain-regression (ERM) backbone for the mp20_5k baseline.
+#
+# Self-contained copy of configs/erm/equiformer_v2/base.yml so that this
+# baseline cannot drift if the extrapolation-benchmark configs are edited.
+#
+# The `model:` block below is IDENTICAL to
+# configs/mex-single/equiformer_v2/base_ebm.yml in all 35 keys except `name`
+# (equiformer_v2-direct here vs equiformer_v2-mex there).  Same 8 layers,
+# lmax 4, 128 sphere channels, 20 neighbours, 12 A cutoff, same dropout and
+# weight init.  Do not edit either file without editing the other, or the
+# comparison in tab:model_comparison stops being controlled.
+#
+# equiformer_v2-direct shares the backbone (get_mol_rep) and replaces the
+# energy head with a 2-layer MLP to a scalar
+# (ocp/ocpmodels/models/equiformer_v2/equiformer_v2_oc20.py:733-762).
+# No DFO, no contrastive loss, no search bounds, no infer_type.
+
+trainer: ocp
+hide_eval_progressbar: True
+
+task:
+  dataset: lmdb
+  description: "Plain L1 regression to y on mp20_5k (baseline for MEX comparison)"
+  type: regression
+  metric: mae
+  strict_load: False
+
+loss_functions:
+  - y:
+      fn: mae
+      coefficient: 1
+
+evaluation_metrics:
+  metrics:
+    y:
+      - mae
+  primary_metric: y_mae
+
+outputs:
+  y:
+    level: system
+    prediction_dtype: float32
+
+model:
+  name: equiformer_v2-direct
+  task_name: 'y'
+  atom_noise_scale:         null
+  cell_noise_scale:         null
+  use_pbc:                  True
+  otf_graph:                True
+  max_neighbors:            20
+  max_radius:               12.0
+  regress_forces:           False
+  max_num_elements:         100
+
+  num_layers:               8
+  sphere_channels:          128
+  attn_hidden_channels:     64
+  num_heads:                8
+  attn_alpha_channels:      64
+  attn_value_channels:      16
+  ffn_hidden_channels:      128
+  norm_type:                'layer_norm_sh'
+
+  lmax_list:                [4]
+  mmax_list:                [2]
+  grid_resolution:          18
+
+  num_sphere_samples:       128
+
+  edge_channels:            128
+  use_atom_edge_embedding:  True
+  distance_function:        'gaussian'
+  num_distance_basis:       512
+
+  attn_activation:          'silu'
+  use_s2_act_attn:          False
+  ffn_activation:           'silu'
+  use_gate_act:             False
+  use_grid_mlp:             True
+
+  alpha_drop:               0.1
+  drop_path_rate:           0.1
+  proj_drop:                0.0
+
+  weight_init:              'uniform'

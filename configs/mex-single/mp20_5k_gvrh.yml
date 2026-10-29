@@ -1,0 +1,35 @@
+includes:
+- configs/mex-single/equiformer_v2/base_ebm.yml
+- configs/mex-single/params/base_param.yml
+
+# loss_functions:
+#   - y:
+#       fn: info-nce
+#       coefficient: 1
+
+dataset:
+  train:
+    format: lmdb
+    src: data/mp20_5k_gvrh/train
+    weighted_sample: false
+    train_max_y: 10.57575268
+    train_min_y: -0.35359627
+    lower_bound: -1.3640603275760355
+    upper_bound: 11.586216737576036
+    infer_type: energy
+    transforms:
+      normalizer:
+        y:
+          mean: 1.8883200141155556
+          stdev: 0.5052320287880178
+
+  val:
+    src: data/mp20_5k_gvrh/val
+
+  test:
+    src: data/mp20_5k_gvrh/test
+
+optim:
+  patience: 10
+
+logger: tensorboard

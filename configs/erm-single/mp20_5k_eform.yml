@@ -1,0 +1,41 @@
+# Plain-regression baseline: formation energy, mp20_5k split.
+#
+# tab:model_comparison reports single-property MEX at 0.345 eV/atom and
+# MEX-Multi at 0.100.  The 71% gap is far outside the multi-task literature
+# (MT-CGCNN: up to 8%), and sec:retrieval shows the single-eform embedding
+# matches MEX-Multi's for formation energy with overlapping CIs -- so the
+# representation is not the bottleneck.  This run isolates the read-out:
+# same backbone, same split, ordinary regression head instead of energy head
+# + DFO.
+#
+#   ~0.10 or better -> the single-property MEX read-out is the bottleneck,
+#                      and the 71% claim must be reframed
+#   ~0.30           -> 4,500 structures really is that hard, and the
+#                      single-property baseline is vindicated
+#
+# Normaliser statistics are copied verbatim from
+# configs/mex-single/mp20_5k_eform.yml so both arms see identically scaled
+# targets.  Data split is the same 4,500/250/250 LMDB.
+
+includes:
+- configs/erm-single/equiformer_v2/base.yml
+- configs/erm-single/params/base_param.yml
+
+dataset:
+  train:
+    format: lmdb
+    src: data/mp20_5k_eform/train
+    weighted_sample: false
+    transforms:
+      normalizer:
+        y:
+          mean: -0.8952717141530322
+          stdev: 0.9020065402946057
+
+  val:
+    src: data/mp20_5k_eform/val
+
+  test:
+    src: data/mp20_5k_eform/test
+
+logger: tensorboard

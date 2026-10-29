@@ -1,0 +1,32 @@
+# Plain-regression baseline: band gap, mp20_5k split.
+#
+# Companion to mp20_5k_eform.yml.  tab:model_comparison reports single-property
+# MEX at 0.662 eV and MEX-Multi at 0.328.  Note that 68.8% of the test set is
+# metallic (E_g exactly 0), so read MAE alongside Spearman here -- see
+# sec:metrics.
+#
+# Normaliser statistics copied verbatim from
+# configs/mex-single/mp20_5k_bandgap.yml.
+
+includes:
+- configs/erm-single/equiformer_v2/base.yml
+- configs/erm-single/params/base_param.yml
+
+dataset:
+  train:
+    format: lmdb
+    src: data/mp20_5k_bandgap/train
+    weighted_sample: false
+    transforms:
+      normalizer:
+        y:
+          mean: 0.6654605333333333
+          stdev: 1.4155904141029494
+
+  val:
+    src: data/mp20_5k_bandgap/val
+
+  test:
+    src: data/mp20_5k_bandgap/test
+
+logger: tensorboard

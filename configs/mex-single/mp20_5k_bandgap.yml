@@ -1,0 +1,35 @@
+includes:
+- configs/mex-single/equiformer_v2/base_ebm.yml
+- configs/mex-single/params/base_param.yml
+
+# loss_functions:
+#   - y:
+#       fn: info-nce
+#       coefficient: 1
+
+dataset:
+  train:
+    format: lmdb
+    src: data/mp20_5k_bandgap/train
+    weighted_sample: false
+    train_max_y: 9.3913
+    train_min_y: 0.0
+    lower_bound: -2.831180828205899
+    upper_bound: 12.222480828205898
+    infer_type: energy
+    transforms:
+      normalizer:
+        y:
+          mean: 0.6654605333333333
+          stdev: 1.4155904141029494
+
+  val:
+    src: data/mp20_5k_bandgap/val
+
+  test:
+    src: data/mp20_5k_bandgap/test
+
+optim:
+  patience: 10
+
+logger: tensorboard

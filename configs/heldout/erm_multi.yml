@@ -1,0 +1,26 @@
+# Held-out evaluation config: ERM-multi.
+#
+# Identical to configs/erm-multi/mp20_5k_multi.yml in every respect except dataset.test.src, which points at
+# the 4,803-structure held-out library built by build_heldout_lmdb.py -- the
+# members of the 9,803-structure three-property pool that were never drawn into
+# mp20_5k, and so were seen by no arm during training or model selection.
+#
+# Purpose: the mp20_5k test set has 250 structures and an 18-structure true
+# Pareto front, where one recovered structure is 5.6 points of recall and every
+# comparison outside min-min-min came back indistinguishable. The held-out
+# library's true front is 43 structures under min-min-min, so one structure is
+# 2.3 points and recall no longer saturates at 16/18.
+#
+# USE FOR --mode predict ONLY. dataset.train and dataset.val are inherited
+# unchanged so the normaliser statistics stay exactly what the checkpoint was
+# trained with; nothing here should be used to train.
+#
+# Config includes deep-merge (ocp/ocpmodels/common/utils.py:merge_dicts), so
+# overriding dataset.test.src leaves train, val and the normaliser untouched.
+
+includes:
+- configs/erm-multi/mp20_5k_multi.yml
+
+dataset:
+  test:
+    src: data/mp20_heldout/test
